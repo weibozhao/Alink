@@ -133,10 +133,10 @@ public class FmOptimizer {
 			if (task.equals(Task.BINARY_CLASSIFICATION)) {
 				lossCurve[3 * step + 1] = loss[2] / context.getNumTask();
 				if (AlinkGlobalConfiguration.isPrintProcessInfo()) {
-					System.out.println("step : " + step + " loss : "
-						+ loss[0] / loss[1] + "  auc : " + loss[2] / context.getNumTask() + " accuracy : "
-						+ loss[3] / loss[1] + " time : " + (System.currentTimeMillis()
-						- oldTime));
+					//System.out.println("step : " + step + " loss : "
+					//	+ loss[0] / loss[1] + "  auc : " + loss[2] / context.getNumTask() + " accuracy : "
+					//	+ loss[3] / loss[1] + " time : " + (System.currentTimeMillis()
+					//	- oldTime));
 					oldTime = System.currentTimeMillis();
 				}
 			} else {
