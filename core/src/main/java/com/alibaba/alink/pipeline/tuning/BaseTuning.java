@@ -47,6 +47,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -1010,72 +1011,93 @@ public abstract class BaseTuning<T extends BaseTuning <T, M>, M extends BaseTuni
 			});
 	}
 
-	private DataSet <Tuple2 <Integer, Row>> split(BatchOperator <?> data, int k) {
+	private DataSet <Tuple2 <Integer, Row>> split(BatchOperator <?> data, final int k) {
 
-		DataSet <Row> input = shuffle(data.getDataSet());
-
-		DataSet <Tuple2 <Integer, Long>> counts = DataSetUtils.countElementsPerPartition(input);
-
+		DataSet <Row> input = data.getDataSet();
 		return input
 			.mapPartition(new RichMapPartitionFunction <Row, Tuple2 <Integer, Row>>() {
 				private static final long serialVersionUID = -902599228310615694L;
-				long taskStart = 0L;
-				long totalNumInstance = 0L;
-
-				@Override
-				public void open(Configuration parameters) {
-					List <Tuple2 <Integer, Long>> counts1 = getRuntimeContext().getBroadcastVariable("counts");
-
-					int taskId = getRuntimeContext().getIndexOfThisSubtask();
-					for (Tuple2 <Integer, Long> cnt : counts1) {
-
-						if (taskId < cnt.f0) {
-							taskStart += cnt.f1;
-						}
-
-						totalNumInstance += cnt.f1;
-					}
-				}
 
 				@Override
 				public void mapPartition(Iterable <Row> values, Collector <Tuple2 <Integer, Row>> out) {
-					DistributedInfo distributedInfo = new DefaultDistributedInfo();
-					Tuple2 <Integer, Long> split1 = new Tuple2 <>(-1, -1L);
-					long lcnt = taskStart;
-
-					for (int i = 0; i <= k; ++i) {
-						long sp = distributedInfo.startPos(i, k, totalNumInstance);
-						long lrc = distributedInfo.localRowCnt(i, k, totalNumInstance);
-
-						if (taskStart < sp) {
-							split1.f0 = i - 1;
-							split1.f1 = distributedInfo.startPos(i - 1, k, totalNumInstance)
-								+ distributedInfo.localRowCnt(i - 1, k, totalNumInstance);
-
-							break;
-						}
-
-						if (taskStart == sp) {
-							split1.f0 = i;
-							split1.f1 = sp + lrc;
-
-							break;
-						}
-					}
-
+					Random random = new Random(2021);
 					for (Row val : values) {
-
-						if (lcnt >= split1.f1) {
-							split1.f0 += 1;
-							split1.f1 = distributedInfo.localRowCnt(split1.f0, k, totalNumInstance) + lcnt;
-						}
-
-						out.collect(Tuple2.of(split1.f0, val));
-						lcnt++;
+						int id = random.nextInt(k);
+						out.collect(Tuple2.of(id, val));
+						//if (id == 0) {
+						//	System.out.println(val.getField(0));
+						//}
 					}
 				}
-			}).withBroadcastSet(counts, "counts");
+			});
 	}
+
+	//private DataSet <Tuple2 <Integer, Row>> split(BatchOperator <?> data, int k) {
+	//
+	//	DataSet <Row> input = shuffle(data.getDataSet());
+	//
+	//	DataSet <Tuple2 <Integer, Long>> counts = DataSetUtils.countElementsPerPartition(input);
+	//
+	//	return input
+	//		.mapPartition(new RichMapPartitionFunction <Row, Tuple2 <Integer, Row>>() {
+	//			private static final long serialVersionUID = -902599228310615694L;
+	//			long taskStart = 0L;
+	//			long totalNumInstance = 0L;
+	//
+	//			@Override
+	//			public void open(Configuration parameters) {
+	//				List <Tuple2 <Integer, Long>> counts1 = getRuntimeContext().getBroadcastVariable("counts");
+	//
+	//				int taskId = getRuntimeContext().getIndexOfThisSubtask();
+	//				for (Tuple2 <Integer, Long> cnt : counts1) {
+	//
+	//					if (taskId < cnt.f0) {
+	//						taskStart += cnt.f1;
+	//					}
+	//
+	//					totalNumInstance += cnt.f1;
+	//				}
+	//			}
+	//
+	//			@Override
+	//			public void mapPartition(Iterable <Row> values, Collector <Tuple2 <Integer, Row>> out) {
+	//				DistributedInfo distributedInfo = new DefaultDistributedInfo();
+	//				Tuple2 <Integer, Long> split1 = new Tuple2 <>(-1, -1L);
+	//				long lcnt = taskStart;
+	//
+	//				for (int i = 0; i <= k; ++i) {
+	//					long sp = distributedInfo.startPos(i, k, totalNumInstance);
+	//					long lrc = distributedInfo.localRowCnt(i, k, totalNumInstance);
+	//
+	//					if (taskStart < sp) {
+	//						split1.f0 = i - 1;
+	//						split1.f1 = distributedInfo.startPos(i - 1, k, totalNumInstance)
+	//							+ distributedInfo.localRowCnt(i - 1, k, totalNumInstance);
+	//
+	//						break;
+	//					}
+	//
+	//					if (taskStart == sp) {
+	//						split1.f0 = i;
+	//						split1.f1 = sp + lrc;
+	//
+	//						break;
+	//					}
+	//				}
+	//
+	//				for (Row val : values) {
+	//
+	//					if (lcnt >= split1.f1) {
+	//						split1.f0 += 1;
+	//						split1.f1 = distributedInfo.localRowCnt(split1.f0, k, totalNumInstance) + lcnt;
+	//					}
+	//
+	//					out.collect(Tuple2.of(split1.f0, val));
+	//					lcnt++;
+	//				}
+	//			}
+	//		}).withBroadcastSet(counts, "counts");
+	//}
 
 	private List <Tuple2 <Integer, Row>> split(LocalOperator <?> data, int k) {
 		ArrayList <Tuple2 <Integer, Row>> list = new ArrayList <>();

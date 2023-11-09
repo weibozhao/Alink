@@ -204,9 +204,9 @@ public class Sgd extends Optimizer {
 			double gradNorm = ((Tuple2 <DenseVector, double[]>) context.getObj(OptimVariable.dir)).f0.normL2();
 			if (context.getTaskId() == 0) {
 				if (AlinkGlobalConfiguration.isPrintProcessInfo()) {
-					System.out.println(
-						method.toString() + " method continue at step : " + context.getStepNo() + " cur loss : "
-							+ grad.f1[1] / grad.f1[0] + " grad norm : " + gradNorm + " learning rate : " + eta);
+					//System.out.println(
+					//	method.toString() + " method continue at step : " + context.getStepNo() + " cur loss : "
+					//		+ grad.f1[1] / grad.f1[0] + " grad norm : " + gradNorm + " learning rate : " + eta);
 				}
 			}
 			if (gradNorm < epsilon) {

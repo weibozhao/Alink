@@ -142,10 +142,10 @@ public class FmOptimizer {
 			} else {
 				lossCurve[3 * step + 1] = loss[2] / loss[1];
 				if (AlinkGlobalConfiguration.isPrintProcessInfo()) {
-					System.out.println("step : " + step + " loss : "
-						+ loss[0] / loss[1] + "  mae : " + loss[2] / loss[1] + " mse : "
-						+ loss[3] / loss[1] + " time : " + (System.currentTimeMillis()
-						- oldTime));
+					//System.out.println("step : " + step + " loss : "
+					//	+ loss[0] / loss[1] + "  mae : " + loss[2] / loss[1] + " mse : "
+					//	+ loss[3] / loss[1] + " time : " + (System.currentTimeMillis()
+					//	- oldTime));
 					oldTime = System.currentTimeMillis();
 				}
 			}
