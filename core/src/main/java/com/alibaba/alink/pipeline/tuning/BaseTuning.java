@@ -869,8 +869,8 @@ public abstract class BaseTuning<T extends BaseTuning <T, M>, M extends BaseTuni
 							DataSetConversionUtil.toTable(getMLEnvironmentId(), testInput, schema)))
 					);
 				if (AlinkGlobalConfiguration.isPrintProcessInfo()) {
-					System.out.println(String.format("kFoldCv, k: %d, i: %d, metric: %f",
-						k, i, localMetric));
+					//System.out.println(String.format("kFoldCv, k: %d, i: %d, metric: %f",
+					//	k, i, localMetric));
 				}
 			} catch (Exception ex) {
 				if (AlinkGlobalConfiguration.isPrintProcessInfo()) {

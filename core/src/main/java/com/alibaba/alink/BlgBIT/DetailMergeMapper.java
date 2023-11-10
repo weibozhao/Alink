@@ -1,4 +1,4 @@
-package com.alibaba.alink.operator.batch.classification;
+package com.alibaba.alink.BlgBIT;
 
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple4;

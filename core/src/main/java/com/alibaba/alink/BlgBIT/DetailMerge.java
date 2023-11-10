@@ -1,4 +1,4 @@
-package com.alibaba.alink.operator.batch.classification;
+package com.alibaba.alink.BlgBIT;
 
 import org.apache.flink.ml.api.misc.param.Params;
 
