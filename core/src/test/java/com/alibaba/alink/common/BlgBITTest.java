@@ -31,7 +31,7 @@ public class BlgBITTest {
 		AlinkGlobalConfiguration.setPrintProcessInfo(true);
 		BatchOperator.setParallelism(1);
 
-		String path = "/Users/weibo/workspace/data/blg/blgs_app.csv";
+		String path = "/home/weibo/workspace/data/blgs_app.csv";
 
 		BatchOperator<?> data = new CsvSourceBatchOp().setFilePath(path).setFieldDelimiter(",").setSchemaStr(
 			"f0 string, f1 double,  f2 double,  f3 double, "
@@ -40,8 +40,8 @@ public class BlgBITTest {
 				+ " f14 double,  f15 double,  f16 double,  f17 double,  f18 double, "
 				+ " f19 double,  f20 double, f21 double, label int");
 
-		for (int i = 0; i < 10; ++i) {
-			//System.out.println("Round: " + i);
+		for (int i = 0; i < 100; ++i) {
+			System.out.println("Round: " + i);
 			data = data.shuffle();
 
 			data.link(new AkSinkBatchOp().setOverwriteSink(true).setFilePath("/tmp/tmp_trian.ak"));
@@ -69,7 +69,7 @@ public class BlgBITTest {
 
 			FmClassifier fmClassifier = new FmClassifier()
 				.setFeatureCols(numCols)
-				.setLearnRate(0.005)
+				.setLearnRate(0.004)
 				.setLabelCol("label").setNumFactor(5)
 				.setWithLinearItem(true)
 				.setWithIntercept(true)
@@ -102,6 +102,12 @@ public class BlgBITTest {
 				.setPredictionCol("pred")
 				.setPredictionDetailCol("detail_RF");
 
+			RandomForestClassifier forestClassifier1 = new RandomForestClassifier()
+					.setFeatureCols(numCols)
+					.setLabelCol("label")
+					.setPredictionCol("pred")
+					.setPredictionDetailCol("detail_RF");
+
 			NaiveBayes nb = new NaiveBayes()
 				.setFeatureCols(numCols)
 				.setSmoothing(0.1)
@@ -110,20 +116,20 @@ public class BlgBITTest {
 
 			Pipeline pipeline = new Pipeline()
 				.add(standardScaler)
-				//.add(fmClassifier)
+				.add(fmClassifier)
 				//.add(gbdt)
 				//.add(lr)
 				//.add(svm)
 				//.add(nb)
-				.add(forestClassifier)
+				.add(forestClassifier1)
 				.add(new DetailMerge().setSelectedCols("label"
 					, "detail_RF"
 					//, "detail_gbdt"
-					//, "detail_fm"
-					//, "detail_lr"
+					, "detail_fm"
+					, "detail_lr"
 					//, "detail_nb"
 					//, "detail_svm"
-				).setAlphaArray(new double[]{1.0}));
+				).setAlphaArray(new double[]{0.5, 0.5}));
 
 			ParamGrid paramGridRF = new ParamGrid();
 			//.addGrid(forestClassifier, RandomForestClassifier.MAX_DEPTH, new Integer[] {6});
@@ -134,12 +140,68 @@ public class BlgBITTest {
 				.setNumFolds(5)
 				.setParamGrid(paramGridRF);
 			gridSearchCV.fit(trainData);
+
+
+			Pipeline pipeline1 = new Pipeline()
+					.add(standardScaler)
+					//.add(fmClassifier)
+					//.add(gbdt)
+					//.add(lr)
+					//.add(svm)
+					//.add(nb)
+					.add(forestClassifier1)
+					.add(new DetailMerge().setSelectedCols("label"
+							, "detail_RF"
+							//, "detail_gbdt"
+							//, "detail_fm"
+							//, "detail_lr"
+							//, "detail_nb"
+							//, "detail_svm"
+					).setAlphaArray(new double[]{1.0}));
+
+			//.addGrid(forestClassifier, RandomForestClassifier.MAX_DEPTH, new Integer[] {6});
+			//.addGrid(nb, NaiveBayes.SMOOTHING, new Double[] {1.0,0.1,0.01});
+			GridSearchCV gridSearchCV1 = new GridSearchCV()
+					.setEstimator(pipeline1)
+					.setTuningEvaluator(tuningEvaluator)
+					.setNumFolds(5)
+					.setParamGrid(paramGridRF);
+			gridSearchCV1.fit(trainData);
+
+
+			Pipeline pipeline2 = new Pipeline()
+					.add(standardScaler)
+					.add(fmClassifier)
+					//.add(gbdt)
+					//.add(lr)
+					//.add(svm)
+					//.add(nb)
+					//.add(forestClassifier1)
+					.add(new DetailMerge().setSelectedCols("label"
+							//, "detail_RF"
+							//, "detail_gbdt"
+							, "detail_fm"
+							//, "detail_lr"
+							//, "detail_nb"
+							//, "detail_svm"
+					).setAlphaArray(new double[]{1.0}));
+
+			//.addGrid(forestClassifier, RandomForestClassifier.MAX_DEPTH, new Integer[] {6});
+			//.addGrid(nb, NaiveBayes.SMOOTHING, new Double[] {1.0,0.1,0.01});
+			GridSearchCV gridSearchCV2 = new GridSearchCV()
+					.setEstimator(pipeline2)
+					.setTuningEvaluator(tuningEvaluator)
+					.setNumFolds(5)
+					.setParamGrid(paramGridRF);
+			gridSearchCV2.fit(trainData);
+
+
 		}
 	}
 
 	@Test
 	public void procData() throws Exception {
-		String filePath = "/Users/weibo/workspace/data/blg/results/rf_100.txt";
+		String filePath = "/home/hotsun/workspace/data/blgs_app.csv";
 		BufferedReader br = new BufferedReader(new FileReader(filePath));
 		String line;
 		double auc = 0;
