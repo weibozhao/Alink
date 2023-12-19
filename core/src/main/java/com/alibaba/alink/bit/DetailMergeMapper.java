@@ -1,5 +1,6 @@
-package com.alibaba.alink.BlgBIT;
+package com.alibaba.alink.bit;
 
+import com.alibaba.alink.params.shared.colname.HasReservedColsDefaultAsNull;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.ml.api.misc.param.Params;
@@ -31,59 +32,34 @@ public class DetailMergeMapper extends Mapper {
 	@Override
 	protected Tuple4 <String[], String[], TypeInformation <?>[], String[]> prepareIoSchema(TableSchema dataSchema,
 																						   Params params) {
-		return Tuple4.of(params.get(HasSelectedCols.SELECTED_COLS), new String[]{"label", "detail"},
-			new TypeInformation[]{AlinkTypes.INT, AlinkTypes.STRING}, new String[]{});
+		return Tuple4.of(params.get(HasSelectedCols.SELECTED_COLS), new String[]{"detail"},
+			new TypeInformation[]{AlinkTypes.STRING}, params.get(HasReservedColsDefaultAsNull.RESERVED_COLS));
 	}
 
 	@Override
 	protected void map(SlicedSelectedSample selection, SlicedResult result) throws Exception {
 		if (alphaArray == null) {
-			alphaArray = new double[selection.length() - 1];
-			Arrays.fill(alphaArray, 1.0/ (selection.length()-1));
+			alphaArray = new double[selection.length()];
+			Arrays.fill(alphaArray, 1.0 / (selection.length()));
 		}
 		Map <String, Double> detail = new HashMap <>();
-		//int cnt_1 = 0;
-		//int cnt_0 = 0;
-		//String s = "1";
-		//for (int i = 1; i < selection.length(); ++i) {
-		//	String json1 = (String) selection.get(i);
-		//
-		//	Map <String, Object> detail_fo = JsonConverter.fromJson(json1,
-		//		new TypeReference <HashMap <String, Object>>() {}.getType());
-		//
-		//	double val = Double.parseDouble(detail_fo.get(s).toString());
-		//	if (val > 0.5) {
-		//		cnt_1 ++;
-		//	} else {
-		//		cnt_0 ++;
-		//	}
-		//}
-		//if (cnt_0 > cnt_1) {
-		//	detail.put("1", 0.0);
-		//	detail.put("0", 1.0);
-		//} else {
-		//	detail.put("0", 0.0);
-		//	detail.put("1", 1.0);
-		//}
-
-		for (int i = 1; i < selection.length(); ++i) {
+		for (int i = 0; i < selection.length(); ++i) {
 			String json1 = (String) selection.get(i);
 
 			Map <String, Object> detail_fo = JsonConverter.fromJson(json1,
 				new TypeReference <HashMap <String, Object>>() {}.getType());
-			int size = selection.length() - 1;
+			int size = selection.length();
 			for (String s : detail_fo.keySet()) {
 				if (detail.containsKey(s)) {
 					double val = Double.parseDouble(detail_fo.get(s).toString());
-					detail.put(s, alphaArray[i-1] * val +  detail.get(s));
+					detail.put(s, alphaArray[i] * val +  detail.get(s));
 				} else {
 					double val = Double.parseDouble(detail_fo.get(s).toString());
-					detail.put(s, alphaArray[i-1] * val);
+					detail.put(s, alphaArray[i] * val);
 				}
 			}
 		}
 		String jsonDetail = JsonConverter.toJson(detail);
-		result.set(0, selection.get(0));
-		result.set(1, jsonDetail);
+		result.set(0, jsonDetail);
 	}
 }

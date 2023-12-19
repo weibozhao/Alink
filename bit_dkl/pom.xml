@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>alink</artifactId>
+        <groupId>com.alibaba.alink</groupId>
+        <version>1.6-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>bit_dkl-${alink.flink.major.version}</artifactId>
+    <name>bit_dkl</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.alibaba.alink</groupId>
+            <artifactId>alink_core_flink-${alink.flink.major.version}_${alink.scala.major.version}</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <!--
+        Note: Add scope as `provided` to exclude flink packages when running on cluster.
+              Ps: If we add `provided` as default, it will be crash when running on local.
+        -->
+
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-streaming-java_${alink.scala.major.version}</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-streaming-scala_${alink.scala.major.version}</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-api-java-bridge_${alink.scala.major.version}</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-api-java</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-planner_${alink.scala.major.version}</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-clients_${alink.scala.major.version}</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-slf4j-impl</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.fommil.netlib</groupId>
+            <artifactId>all</artifactId>
+            <type>pom</type>
+        </dependency>
+
+        <!-- Add scope as `provided` ends here. -->
+
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <dependencies>
+                    <!--参见dependencies/dependency元素 -->
+                    <dependency>
+                        <groupId>com.alibaba.alink</groupId>
+                        <artifactId>alink_core_flink-${alink.flink.major.version}_${alink.scala.major.version}</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>shade-flink</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <artifactSet>
+                                <includes combine.children="append">
+                                    <include>com.alibaba.alink</include>
+                                    <include>org.apache.flink:flink-core</include>
+                                    <include>org.apache.flink:flink-java</include>
+                                    <include>org.apache.flink:flink-table-common</include>
+                                    <include>org.apache.flink:flink-shaded-*</include>
+                                    <include>org.apache.flink:flink-streaming-java_2.11</include>
+<!--                                    <include>org.apache.flink:flink-streaming-scala</include>-->
+                                    <include>org.reflections:reflections</include>
+                                    <include>org.javassist:javassist</include>
+                                    <include>commons-collections:commons-collections</include>
+
+                                    <include>org.apache.commons:commons-compress</include>
+                                    <include>org.tensorflow:ndarray</include>
+                                    <include>org.tukaani:xz</include>
+
+                                    <include>org.apache.commons:commons-math3</include>
+
+                                    <include>com.esotericsoftware.kryo:kryo</include>
+
+                                    <include>com.esotericsoftware.reflectasm:reflectasm</include>
+
+                                    <include>com.esotericsoftware.minlog:minlog</include>
+
+                                    <include>com.fasterxml.jackson.core:jackson-core</include>
+                                    <include>com.fasterxml.jackson.core:jackson-databind</include>
+                                    <include>com.fasterxml.jackson.core:jackson-annotations</include>
+                                    <inclide>com.github.fommil.netlib:core</inclide>>
+                                    <inclide>com.github.fommil.netlib:native_*</inclide>
+                                    <include>com.github.fommil.netlib:*</include>
+                                    <include>net.sourceforge.f2j:arpack_combined_all</include>
+                                    <include>stax:stax-api</include>
+                                    <include>com.typesafe:config</include>
+                                    <include>org.uncommons.maths:uncommons-maths</include>
+                                    <include>com.github.scopt:scopt_*</include>
+                                    <include>xml-apis:*</include>
+                                    <include>org.apache.flink:flink-table-api-java-bridge_2.11</include>
+                                    <include>org.apache.flink:flink-table-api-java</include>
+                                    <include>org.apache.flink:flink-table-planner_2.11</include>
+                                    <include>org.slf4j:slf4j-api</include>
+                                    <include>com.google.code.gson:gson</include>
+                                    <include>com.google.guava:guava</include>
+                                    <include>commons-io:commons-io</include>
+                                    <include>org.apache.commons:commons-lang3</include>
+                                </includes>
+                            </artifactSet>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--maven-jar-plugin的作用是配置mainClass和指定classpath。-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <!--是否在manifest文件中添加classpath。默认为false。-->
+                            <addClasspath>true</addClasspath>
+                            <!--指定类路径前缀，也就是依赖的jar包所在的文件夹-->
+                            <classpathPrefix>target/</classpathPrefix>
+                            <!--指定启动类-->
+                            <mainClass>com.bit.dkl.Main</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources</directory>
+                                    <includes>
+                                        <include>*.ak</include>
+                                        <include>*.png</include>
+                                        <include>*.bat</include>
+                                        <include>*.html</include>
+                                        <include>*.sh</include>
+                                        <include>*.md</include>
+                                        <include>*.csv</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

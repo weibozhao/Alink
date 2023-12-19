@@ -1,0 +1,143 @@
+<!doctype html>
+<html>
+<head>
+<meta charset='UTF-8'><meta name='viewport' content='width=device-width initial-scale=1'>
+<title>README</title>
+</head>
+<body><h2 id='使用手册'>使用手册</h2>
+<h3 id='软件安装'>软件安装</h3>
+<p>该软件是一个tgz压缩包，直接解压tgz包便可以使用。</p>
+<pre><code>tar -xvf bit.gz
+cd bit
+</code></pre>
+<h3 id='软件启动'>软件启动</h3>
+<p>该软件有两种启动模式，命令模式和GUI模式。</p>
+<h4 id='命令模式启动'>命令模式启动</h4>
+<p>进入解压后的目录，执行下面的命令启动软件。</p>
+<pre><code>sh bit.sh
+</code></pre>
+<h4 id='gui模式启动'>GUI模式启动</h4>
+<p>进入解压后的目录，执行下面的命令启动软件。</p>
+<pre><code>sh bit.sh --gui
+</code></pre>
+<h3 id='软件使用命令模式）'>软件使用（命令模式）</h3>
+<p>软件启动后会进入下面的启动界面：</p>
+<pre><code>**************************************************************
+              Welcome to use bit.
+**************************************************************
+Please enter a number to choose the processing type.
+**************************************************************
+0: using wcy model to predict one sample.
+1: using wcy model to predict more than one samples in a file.
+2: using dkl model to predict one sample.
+3: using dkl model to predict more than one samples in a file.
+**************************************************************
+type: 
+</code></pre>
+<p>使用前需要设置处理类型，一共有4种处理类型（可扩展添加）：</p>
+<ol start='' >
+<li>使用王辰悦的模型预测一条样本。</li>
+<li>使用王辰悦的模型预测多条样本，这些样本存在一个文件中，需要设置文件的路径作为参数。 </li>
+<li>使用窦凯乐的模型预测一条样本。</li>
+<li>使用窦凯乐的模型预测多条样本，这些样本存在一个文件中，需要设置文件的路径作为参数。</li>
+
+</ol>
+<h4 id='单样本预测'>单样本预测</h4>
+<p>当输入0、2时，会提示你输入待预测的样本：</p>
+<pre><code>**************************************************************
+              Welcome to use bit.
+**************************************************************
+Please enter a number to choose the processing type.
+**************************************************************
+0: using wcy model to predict one sample.
+1: using wcy model to predict more than one samples in a file.
+2: using dkl model to predict one sample.
+3: using dkl model to predict more than one samples in a file.
+**************************************************************
+type: 0 
+input sample: 
+
+</code></pre>
+<p>你需要将样本的特征依次输入到屏幕上然后回车，特征之间用逗号隔开，这时会返回该条样本的预测结果。</p>
+<pre><code>**************************************************************
+0: using wcy model to predict one sample.
+1: using wcy model to predict more than one samples in a file.
+2: using dkl model to predict one sample.
+3: using dkl model to predict more than one samples in a file.
+**************************************************************
+type: 0   
+input sample: 1,2,3,4
+output: +I[{&quot;0&quot;:0.78908403015162,&quot;1&quot;:0.21091596984838004}]
+
+</code></pre>
+<p>结果给出了 0 和 1 的概率。</p>
+<h4 id='多样本预测'>多样本预测</h4>
+<p>当输入1、3时，会提示你输入你的样本文件Path：</p>
+<pre><code>**************************************************************
+              Welcome to use bit.
+**************************************************************
+Please enter a number to choose the processing type.
+**************************************************************
+0: using wcy model to predict one sample.
+1: using wcy model to predict more than one samples in a file.
+2: using dkl model to predict one sample.
+3: using dkl model to predict more than one samples in a file.
+**************************************************************
+type: 1
+input file path: 
+
+</code></pre>
+<p>你需要将样本文件的路径（绝对路径和相对路径均可以）输入到屏幕上然后回车，这时会返回每一条样本的预测结果。</p>
+<p>样本文件示例：</p>
+<pre><code>0.0011,12.328239,0.506288,1.4991
+1.117,14.274442,0.544443,1.5149
+0.6083,13.907269,0.120538,1.6464
+0.1811,14.24284,0.299885,1.4724
+</code></pre>
+<p>对应的结果输出：</p>
+<pre><code>**************************************************************
+0: using wcy model to predict one sample.
+1: using wcy model to predict more than one samples in a file.
+2: using dkl model to predict one sample.
+3: using dkl model to predict more than one samples in a file.
+**************************************************************
+type: 1   
+input file path: ./w.csv
+0.0011,12.328239,0.506288,1.4991 output : +I[{&quot;0&quot;:0.2095663244073429,&quot;1&quot;:0.7904336755926571}]
+1.117,14.274442,0.544443,1.5149 output : +I[{&quot;0&quot;:0.18830338062582092,&quot;1&quot;:0.8116966193741793}]
+0.6083,13.907269,0.120538,1.6464 output : +I[{&quot;0&quot;:0.20535702392684813,&quot;1&quot;:0.7946429760731519}]
+0.1811,14.24284,0.299885,1.4724 output : +I[{&quot;0&quot;:0.18925736790557232,&quot;1&quot;:0.8107426320944277}]
+</code></pre>
+<h4 id='软件退出'>软件退出</h4>
+<p>在任何时候输入quit，exit，q 这三个中的任何一个，会跳转到上一层，最后一层时继续会退出软件。</p>
+<h3 id='软件使用gui模式）'>软件使用（GUI模式）</h3>
+<p>软件启动后会进入启动界面：</p>
+<pre><code>启动界面有四种使用方式（可扩展添加）：
+1. 使用王辰悦的模型预测一条样本。（wcy预测）
+2. 使用王辰悦的模型预测多条样本，这些样本存在一个文件中，需要设置文件的路径作为参数。（wcy批预测）
+3. 使用窦凯乐的模型预测一条样本。（dkl预测）
+4. 使用窦凯乐的模型预测多条样本，这些样本存在一个文件中，需要设置文件的路径作为参数。（dkl批预测）
+
+界面最上面是输入参数入口，所有使用方式都是从这个入口输入参数。
+</code></pre>
+<h4 id='单样本预测-2'>单样本预测</h4>
+<p>当输入为向量时，需要调用单条样本预测。
+你需要将样本的特征依次输入到输入参数框中，特征之间用逗号隔开，然后点击预测按钮，这时会在结果输出窗口输出该条样本的预测结果。</p>
+<pre><code>input parameter: 1,2,3,4
+output: +I[{&quot;0&quot;:0.78908403015162,&quot;1&quot;:0.21091596984838004}]
+
+</code></pre>
+<p>结果给出了 0 和 1 的概率。</p>
+<h4 id='多样本预测-2'>多样本预测</h4>
+<p>当多条样本预测时，需要输入你的样本文件Path到输入参数的框中：</p>
+<p>你需要将样本文件的路径（绝对路径和相对路径均可以）输入，然后点击批预测按钮，这时会在输出窗口中返回每一条样本的预测结果。</p>
+<p>对应的结果输出：</p>
+<pre><code>input parameter: ./w.csv
+0.0011,12.328239,0.506288,1.4991 output : +I[{&quot;0&quot;:0.2095663244073429,&quot;1&quot;:0.7904336755926571}]
+1.117,14.274442,0.544443,1.5149 output : +I[{&quot;0&quot;:0.18830338062582092,&quot;1&quot;:0.8116966193741793}]
+0.6083,13.907269,0.120538,1.6464 output : +I[{&quot;0&quot;:0.20535702392684813,&quot;1&quot;:0.7946429760731519}]
+0.1811,14.24284,0.299885,1.4724 output : +I[{&quot;0&quot;:0.18925736790557232,&quot;1&quot;:0.8107426320944277}]
+</code></pre>
+<p>&nbsp;</p>
+</body>
+</html>

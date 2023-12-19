@@ -179,11 +179,9 @@
     <modules>
         <module>test_utils</module>
         <module>core</module>
-        <module>dl_predictors</module>
-        <module>connectors</module>
-        <module>examples</module>
-        <module>python</module>
-        <module>plugins</module>
+        <module>bit_wcy</module>
+        <module>bit_dkl</module>
+        <module>bit</module>
     </modules>
 
     <build>
@@ -324,6 +322,24 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>only_eas</id>
+            <properties>
+                <ut.folder>com/alibaba/alink</ut.folder>
+                <flink.version>1.13.0</flink.version>
+                <flink.major.version>1.13.0</flink.major.version>
+            </properties>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+                <property>
+                    <name>env.type</name>
+                    <value>only_eas</value>
+                </property>
+            </activation>
+            <modules>
+                <module>core</module>
+            </modules>
         </profile>
     </profiles>
 </project>

@@ -1,7 +1,5 @@
 package com.alibaba.alink.operator.batch.classification;
 
-import org.apache.flink.types.Row;
-
 import com.alibaba.alink.operator.batch.BatchOperator;
 import com.alibaba.alink.operator.batch.dataproc.JsonValueBatchOp;
 import com.alibaba.alink.operator.batch.evaluation.EvalBinaryClassBatchOp;
@@ -10,6 +8,7 @@ import com.alibaba.alink.operator.common.fm.FmPredictBatchOp;
 import com.alibaba.alink.pipeline.classification.FmClassifier;
 import com.alibaba.alink.pipeline.classification.FmModel;
 import com.alibaba.alink.testutil.AlinkTestBase;
+import org.apache.flink.types.Row;
 import org.junit.Assert;
 import org.junit.Test;
 

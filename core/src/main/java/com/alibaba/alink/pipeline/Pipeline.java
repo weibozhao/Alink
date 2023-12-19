@@ -15,6 +15,7 @@ import com.alibaba.alink.operator.local.LocalOperator;
 import com.alibaba.alink.operator.local.sink.AkSinkLocalOp;
 import com.alibaba.alink.operator.stream.StreamOperator;
 import com.alibaba.alink.params.PipelineModelParams;
+import org.junit.rules.TemporaryFolder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,13 +28,20 @@ import static com.alibaba.alink.pipeline.PipelineModel.getOutSchema;
  * A pipeline is a linear workflow which chains {@link EstimatorBase}s and {@link TransformerBase}s to execute an
  * algorithm.
  */
-public final class Pipeline extends EstimatorBase <Pipeline, PipelineModel> {
+public class Pipeline extends EstimatorBase <Pipeline, PipelineModel> {
 
 	private static final long serialVersionUID = 1562871813230757217L;
 	ArrayList <PipelineStageBase <?>> stages = new ArrayList <>();
 
+	protected boolean isSplitJob = false;
+
 	public Pipeline() {
 		this(new Params());
+	}
+
+	public Pipeline setStepMode(boolean splitJob) {
+		isSplitJob = splitJob;
+		return this;
 	}
 
 	public Pipeline(Params params) {
@@ -50,6 +58,7 @@ public final class Pipeline extends EstimatorBase <Pipeline, PipelineModel> {
 	@Override
 	public Pipeline clone() throws CloneNotSupportedException {
 		Pipeline pipeline = new Pipeline();
+		pipeline.isSplitJob = isSplitJob;
 		for (PipelineStageBase <?> stage : this.stages) {
 			pipeline.add(stage.clone());
 		}
@@ -137,6 +146,27 @@ public final class Pipeline extends EstimatorBase <Pipeline, PipelineModel> {
 		return fit(input, true).f1;
 	}
 
+	protected TransformerBase<?> singleFit(EstimatorBase <?, ?> stage, BatchOperator<?> data) {
+		if (isSplitJob) {
+			try {
+				String path;
+				ModelBase <?> model = stage.fit(data);
+				TemporaryFolder tempFolder = new TemporaryFolder();
+				tempFolder.create();
+				path = tempFolder.getRoot().getAbsolutePath() + "/tmpModelData.ak";
+				model.getModelData().link(new AkSinkBatchOp().setFilePath(path).setOverwriteSink(true));
+				BatchOperator.execute();
+				model.setModelData(new AkSourceBatchOp().setFilePath(path));
+				return model;
+			} catch (Exception e) {
+				e.printStackTrace();
+				throw new RuntimeException("singleFit in pipeline failed.");
+			}
+		} else {
+			return stage.fit(data);
+		}
+	}
+
 	private Tuple2 <TransformerBase <?>[], BatchOperator <?>> fit(BatchOperator <?> input, boolean withTransform) {
 		for (PipelineStageBase <?> stage : stages) {
 			if ((stage instanceof Trainer)
@@ -154,7 +184,7 @@ public final class Pipeline extends EstimatorBase <Pipeline, PipelineModel> {
 
 			if (i <= lastEstimatorIdx) {
 				if (stage instanceof EstimatorBase) {
-					transformers[i] = ((EstimatorBase <?, ?>) stage).fit(input);
+					transformers[i] = singleFit((EstimatorBase <?, ?>) stage, input);
 				} else if (stage instanceof TransformerBase) {
 					transformers[i] = (TransformerBase <?>) stage;
 				}

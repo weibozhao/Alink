@@ -1,4 +1,4 @@
-package com.alibaba.alink.BlgBIT;
+package com.alibaba.alink.bit;
 
 import org.apache.flink.ml.api.misc.param.Params;
 
